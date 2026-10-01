@@ -1,0 +1,34 @@
+﻿# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Compilación
+bin/
+obj/
+
+# Archivos temporales
+*.tmp
+*.temp
+*.log
+
+# Configuración local con secretos
+Web.config
+
+# Mantener la plantilla de configuración
+!Web.config.example
+
+# Publicación
+PublishProfiles/
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# SQL Server local / archivos de base de datos
+*.mdf
+*.ldf
+*.ndf
+
+# Paquetes NuGet restaurables
+packages/

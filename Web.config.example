@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+
+  <connectionStrings>
+    <add name="PruebaTecnicaClientes"
+         connectionString="Server=localhost,1433;Database=PruebaTecnicaClientes;User Id=app_clientes;Password=CAMBIAR_PASSWORD;TrustServerCertificate=True;"
+         providerName="System.Data.SqlClient" />
+  </connectionStrings>
+
+</configuration>
