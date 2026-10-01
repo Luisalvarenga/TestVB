@@ -129,7 +129,7 @@ BEGIN
             PRIMARY KEY (IdBitacora),
 
         CONSTRAINT CK_Bitacora_Accion
-            CHECK (Accion IN (N'AGREGAR', N'EDITAR', N'ELIMINAR')),
+            CHECK (Accion IN (N'AGREGAR', N'EDITAR', N'ELIMINAR', N'REACTIVAR')),
 
         CONSTRAINT FK_Bitacora_Cliente
             FOREIGN KEY (IdCliente)

@@ -17,22 +17,66 @@ Public Class ClienteForm
 
 
     Protected Sub Page_Load(
-        sender As Object,
-        e As EventArgs
-    ) Handles Me.Load
-
-        If Not User.Identity.IsAuthenticated Then
-            Response.Redirect("~/Login.aspx")
-            Return
-        End If
+    sender As Object,
+    e As EventArgs
+) Handles Me.Load
 
         If Not IsPostBack Then
+
             CargarCliente()
+
+            If String.Equals(
+            Request.QueryString("reactivar"),
+            "1",
+            StringComparison.Ordinal
+        ) Then
+
+                MostrarModalReactivacion()
+
+            End If
 
         End If
 
     End Sub
 
+
+    Private Sub MostrarModalReactivacion()
+
+        Dim idCliente As Integer
+
+        If Not Integer.TryParse(
+        Convert.ToString(Session("IdClienteReactivar")),
+        idCliente
+    ) OrElse idCliente <= 0 Then
+
+            Response.Redirect("~/Clientes.aspx")
+            Return
+
+        End If
+
+        Dim documento As String =
+        Convert.ToString(Session("DocumentoReactivar"))
+
+        lblDocumentoReactivar.Text =
+        Server.HtmlEncode(documento)
+
+        Dim script As String =
+    "window.addEventListener('load', function () {" &
+    "    var modalElement = document.getElementById('modalReactivar');" &
+    "    if (modalElement && typeof bootstrap !== 'undefined') {" &
+    "        var modal = bootstrap.Modal.getOrCreateInstance(modalElement);" &
+    "        modal.show();" &
+    "    }" &
+    "});"
+
+        ClientScript.RegisterStartupScript(
+    Me.GetType(),
+    "mostrarModalReactivar",
+    script,
+    True
+    )
+
+    End Sub
 
     Private Sub CargarCliente()
 
@@ -117,33 +161,46 @@ Public Class ClienteForm
                 )
 
 
-            Dim service As New ClienteService()
+            Dim _clienteService As New ClienteService()
 
 
             If IdClienteActual = 0 Then
 
-                Dim nuevoId As Integer =
-                    service.AgregarCliente(
-                        cliente,
-                        idUsuario,
-                        nombreUsuario
-                    )
+                Dim resultado As Integer =
+        _clienteService.AgregarCliente(
+            cliente,
+            idUsuario,
+            nombreUsuario
+        )
+
+                If resultado < 0 Then
+
+                    Dim idClienteInactivo As Integer =
+            Math.Abs(resultado)
+
+                    Session("IdClienteReactivar") =
+            idClienteInactivo
+
+                    Session("DocumentoReactivar") =
+            cliente.Documento
+
+                    Response.Redirect("~/ClienteForm.aspx?reactivar=1")
+
+                    Return
+
+                End If
 
             Else
 
-                service.EditarCliente(
-                    cliente,
-                    idUsuario,
-                    nombreUsuario
-                )
+                _clienteService.EditarCliente(
+        cliente,
+        idUsuario,
+        nombreUsuario
+    )
 
             End If
 
-
-            Response.Redirect(
-                "~/Clientes.aspx",
-                False
-            )
+            Response.Redirect("~/Clientes.aspx")
 
             Context.ApplicationInstance.CompleteRequest()
 
@@ -162,13 +219,64 @@ Public Class ClienteForm
         Catch ex As Exception
 
             MostrarMensaje(
-                "Ocurrió un error al guardar el cliente."
-            )
+        "ERROR: " & ex.ToString()
+    )
 
         End Try
 
     End Sub
 
+    Protected Sub btnReactivar_Click(
+    sender As Object,
+    e As EventArgs
+) Handles btnReactivar.Click
+
+        Try
+
+            Dim idCliente As Integer
+
+            If Not Integer.TryParse(
+            Convert.ToString(Session("IdClienteReactivar")),
+            idCliente
+        ) OrElse idCliente <= 0 Then
+
+                MostrarMensaje("No se pudo identificar el cliente a reactivar.")
+                Return
+
+            End If
+
+            Dim idUsuario As Integer =
+            Convert.ToInt32(Session("IdUsuario"))
+
+            Dim nombreUsuario As String =
+            Convert.ToString(Session("NombreUsuario"))
+
+            Dim service As New ClienteService()
+
+            service.ReactivarCliente(
+            idCliente,
+            idUsuario,
+            nombreUsuario
+        )
+
+            Session.Remove("IdClienteReactivar")
+            Session.Remove("DocumentoReactivar")
+
+            Response.Redirect("~/Clientes.aspx")
+
+        Catch ex As ArgumentException
+
+            MostrarMensaje(ex.Message)
+
+        Catch ex As Exception
+
+            MostrarMensaje(
+            "No fue posible reactivar el cliente."
+        )
+
+        End Try
+
+    End Sub
 
     Private Function ObtenerIdClienteDesdeQueryString() As Integer
 
@@ -212,5 +320,6 @@ Public Class ClienteForm
         lblMensaje.Visible = True
 
     End Sub
+
 
 End Class

@@ -59,6 +59,10 @@
     // Protección contra doble envío
     // ---------------------------------------------
 
+    // ---------------------------------------------
+    // Protección contra doble envío
+    // ---------------------------------------------
+
     const formulario =
         document.getElementById("formMaster");
 
@@ -73,14 +77,21 @@
 
             botones.forEach(function (boton) {
 
-                boton.disabled = true;
+                // Esperamos a que Web Forms capture
+                // correctamente el submit antes de
+                // deshabilitar el botón.
+                setTimeout(function () {
 
-                if (boton.tagName === "INPUT") {
-                    boton.value = "Procesando...";
-                }
-                else {
-                    boton.textContent = "Procesando...";
-                }
+                    boton.disabled = true;
+
+                    if (boton.tagName === "INPUT") {
+                        boton.value = "Procesando...";
+                    }
+                    else {
+                        boton.textContent = "Procesando...";
+                    }
+
+                }, 0);
 
             });
 

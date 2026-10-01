@@ -67,14 +67,20 @@ Public Class ClienteService
         ValidarCliente(cliente)
         ValidarUsuario(idUsuario, nombreUsuario)
 
-        If _clienteRepository.ExisteDocumento(
-            cliente.Documento,
-            0
-        ) Then
+        Dim clienteExistente As Cliente =
+    _clienteRepository.ObtenerPorDocumento(
+        cliente.Documento
+    )
 
-            Throw New ArgumentException(
-                "Ya existe un cliente con ese documento."
-            )
+        If clienteExistente IsNot Nothing Then
+
+            If clienteExistente.Activo Then
+                Throw New ArgumentException(
+            "Ya existe un cliente activo con ese documento."
+        )
+            End If
+
+            Return -clienteExistente.IdCliente
 
         End If
 
@@ -221,7 +227,6 @@ Public Class ClienteService
 
     End Sub
 
-
     Public Sub EliminarCliente(
         idCliente As Integer,
         idUsuario As Integer,
@@ -293,8 +298,88 @@ Public Class ClienteService
 
     End Sub
 
+    Public Sub ReactivarCliente(
+    idCliente As Integer,
+    idUsuario As Integer,
+    nombreUsuario As String
+)
+
+        If idCliente <= 0 Then
+            Throw New ArgumentException(
+            "El identificador del cliente no es válido."
+        )
+        End If
+
+        If idUsuario <= 0 Then
+            Throw New ArgumentException(
+            "El usuario no es válido."
+        )
+        End If
+
+        If String.IsNullOrWhiteSpace(nombreUsuario) Then
+            Throw New ArgumentException(
+            "El nombre de usuario es obligatorio."
+        )
+        End If
+
+        Using connection As SqlConnection =
+        ConnectionFactory.CreateConnection()
+
+            connection.Open()
+
+            Using transaction As SqlTransaction =
+            connection.BeginTransaction()
+
+                Try
+
+                    _clienteRepository.Reactivar(
+                    idCliente,
+                    connection,
+                    transaction
+                )
+
+                    Dim bitacora As New Bitacora With {
+    .Accion = "REACTIVAR",
+    .IdCliente = idCliente,
+    .IdUsuario = idUsuario,
+    .NombreUsuario = nombreUsuario,
+    .Detalle = "Cliente reactivado."
+}
+
+                    _bitacoraRepository.Registrar(
+                    bitacora,
+                   connection,
+    transaction
+                )
+
+                    transaction.Commit()
+
+                Catch
+
+                    Try
+                        transaction.Rollback()
+                    Catch
+                    End Try
+
+                    Throw
+
+                End Try
+
+            End Using
+
+        End Using
+
+    End Sub
 
     Private Sub ValidarCliente(cliente As Cliente)
+
+        If Not String.IsNullOrWhiteSpace(cliente.Telefono) AndAlso
+           Not System.Text.RegularExpressions.Regex.IsMatch(cliente.Telefono, "^\d+$") Then
+
+            Throw New ArgumentException(
+                "El teléfono únicamente puede contener números."
+            )
+        End If
 
         If cliente Is Nothing Then
             Throw New ArgumentNullException(

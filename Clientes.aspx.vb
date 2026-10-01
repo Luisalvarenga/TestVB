@@ -62,24 +62,18 @@ Public Class Clientes
 
 
     Private Sub CargarClientes()
-
         Try
-
-            Dim clientes As List(Of Cliente) =
-                _clienteService.ObtenerClientes()
-
+            Dim clientes As List(Of Cliente) = _clienteService.ObtenerClientes()
             gvClientes.DataSource = clientes
-
             gvClientes.DataBind()
 
         Catch ex As Exception
+            Response.Write("<div style='padding:10px;background:#f8d7da;color:#000;'>")
+            Response.Write("ERROR: " & Server.HtmlEncode(ex.Message))
+            Response.Write("</div>")
 
-            MostrarMensaje(
-                "No fue posible cargar los clientes."
-            )
-
+            MostrarMensaje("No fue posible cargar los clientes.")
         End Try
-
     End Sub
 
 
@@ -165,4 +159,43 @@ Public Class Clientes
 
     End Sub
 
+    Protected Sub btnBuscar_Click(
+    sender As Object,
+    e As EventArgs
+) Handles btnBuscar.Click
+
+        Try
+
+            Dim busqueda As String =
+                txtBusqueda.Text.Trim()
+
+            Dim clientes As List(Of Cliente) =
+                _clienteService.BuscarClientes(busqueda)
+
+            gvClientes.DataSource = clientes
+            gvClientes.DataBind()
+
+        Catch ex As ArgumentException
+
+            MostrarMensaje(ex.Message)
+
+        Catch ex As Exception
+
+            MostrarMensaje(
+                "No fue posible realizar la búsqueda."
+            )
+
+        End Try
+
+    End Sub
+
+    Protected Sub btnLimpiar_Click(
+    sender As Object,
+    e As EventArgs
+) Handles btnLimpiar.Click
+
+        txtBusqueda.Text = String.Empty
+        CargarClientes()
+
+    End Sub
 End Class

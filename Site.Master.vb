@@ -21,6 +21,33 @@ Public Class SiteMaster
     Private Sub CargarUsuario()
 
         If Not Context.User.Identity.IsAuthenticated Then
+
+            phUsuario.Visible = False
+
+            Return
+
+        End If
+
+
+        Dim nombreCompleto As String =
+            Convert.ToString(
+                Session("NombreCompleto")
+            )
+
+
+        Dim nombreUsuario As String =
+            Convert.ToString(
+                Session("NombreUsuario")
+            )
+
+
+        ' Si existe la cookie de autenticación pero
+        ' la sesión se perdió, no mostrar información
+        ' de un usuario que ya no tenemos identificado
+        ' en la sesión.
+        If String.IsNullOrWhiteSpace(nombreCompleto) AndAlso
+           String.IsNullOrWhiteSpace(nombreUsuario) Then
+
             phUsuario.Visible = False
 
             Return
@@ -31,18 +58,9 @@ Public Class SiteMaster
         phUsuario.Visible = True
 
 
-        Dim nombreCompleto As String =
-            Convert.ToString(
-                Session("NombreCompleto")
-            )
-
-
         If String.IsNullOrWhiteSpace(nombreCompleto) Then
 
-            nombreCompleto =
-                Convert.ToString(
-                    Session("NombreUsuario")
-                )
+            nombreCompleto = nombreUsuario
 
         End If
 
@@ -52,5 +70,4 @@ Public Class SiteMaster
             Server.HtmlEncode(nombreCompleto)
 
     End Sub
-
 End Class

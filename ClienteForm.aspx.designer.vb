@@ -129,4 +129,22 @@ Partial Public Class ClienteForm
     '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
     '''</remarks>
     Protected WithEvents lnkCancelar As Global.System.Web.UI.WebControls.HyperLink
+
+    '''<summary>
+    '''Control lblDocumentoReactivar.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents lblDocumentoReactivar As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''Control btnReactivar.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents btnReactivar As Global.System.Web.UI.WebControls.Button
 End Class

@@ -202,6 +202,60 @@ Public Class ClienteRepository
 
     End Function
 
+    Public Function ObtenerPorDocumento(
+    documento As String
+) As Cliente
+
+        Const sql As String = "
+        SELECT
+            IdCliente,
+            Nombres,
+            Apellidos,
+            Documento,
+            Telefono,
+            Correo,
+            Direccion,
+            Activo,
+            FechaCreacion,
+            FechaModificacion,
+            RowVersion
+        FROM dbo.Clientes
+        WHERE Documento = @Documento;
+    "
+
+        Using connection As SqlConnection =
+        ConnectionFactory.CreateConnection()
+
+            Using command As New SqlCommand(
+            sql,
+            connection
+        )
+
+                command.Parameters.Add(
+                "@Documento",
+                SqlDbType.NVarChar,
+                30
+            ).Value = documento.Trim()
+
+                connection.Open()
+
+                Using reader As SqlDataReader =
+                command.ExecuteReader(CommandBehavior.SingleRow)
+
+                    If Not reader.Read() Then
+                        Return Nothing
+                    End If
+
+                    Return MapearCliente(reader)
+
+                End Using
+
+            End Using
+
+        End Using
+
+    End Function
+
     Public Function Insertar(
         cliente As Cliente,
         connection As SqlConnection,
@@ -330,6 +384,42 @@ Public Class ClienteRepository
 
     End Function
 
+    Public Sub Reactivar(
+    idCliente As Integer,
+    connection As SqlConnection,
+    transaction As SqlTransaction
+)
+
+        Const sql As String =
+        "UPDATE Clientes " &
+        "SET Activo = 1, " &
+        "    FechaModificacion = GETUTCDATE() " &
+        "WHERE IdCliente = @IdCliente " &
+        "  AND Activo = 0;"
+
+        Using command As New SqlCommand(
+        sql,
+        connection,
+        transaction
+    )
+
+            command.Parameters.Add(
+            "@IdCliente",
+            SqlDbType.Int
+        ).Value = idCliente
+
+            Dim filasAfectadas As Integer =
+            command.ExecuteNonQuery()
+
+            If filasAfectadas = 0 Then
+                Throw New InvalidOperationException(
+                "El cliente no existe o ya se encuentra activo."
+            )
+            End If
+
+        End Using
+
+    End Sub
 
     Private Sub AgregarParametros(
         command As SqlCommand,

@@ -245,8 +245,7 @@
                             runat="server"
                             Text="Guardar"
                             CssClass="btn btn-primary"
-                            CausesValidation="True" 
-                            data-single-submit="true"/>
+                            CausesValidation="True"/>
 
 
                         <asp:HyperLink
@@ -269,5 +268,88 @@
         </div>
 
     </div>
+
+    <!-- Modal de reactivación -->
+
+<div
+    class="modal fade"
+    id="modalReactivar"
+    tabindex="-1"
+    aria-labelledby="modalReactivarLabel"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="modalReactivarLabel">
+
+                    Cliente inactivo encontrado
+
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <p class="mb-2">
+                    Ya existe un cliente registrado con el documento:
+                </p>
+
+                <p class="fw-bold mb-3">
+
+                    <asp:Label
+                        ID="lblDocumentoReactivar"
+                        runat="server">
+                    </asp:Label>
+
+                </p>
+
+                <p class="mb-0">
+                    Este cliente se encuentra inactivo.
+                    ¿Desea reactivarlo?
+                </p>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    data-bs-dismiss="modal">
+
+                    Cancelar
+
+                </button>
+
+
+                <asp:Button
+                    ID="btnReactivar"
+                    runat="server"
+                    Text="Reactivar cliente"
+                    CssClass="btn btn-primary"
+                    CausesValidation="False" />
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 </asp:Content>
